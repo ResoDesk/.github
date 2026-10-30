@@ -1,0 +1,29 @@
+name: Bug
+description: Something does not work as designed
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Use synthetic data only. Never paste personal or health data, keys or tokens.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. ...\n2. ..."
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Environment and version
+      placeholder: development / production, commit or tag, trace or case id
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or screenshots (redacted)

@@ -1,0 +1,60 @@
+# Reusable: lint, format, types and tests for a Python project managed by uv.
+# Callers pin a tag: uses: ResoDesk/.github/.github/workflows/python-uv.yml@v1
+#
+# The repo is checked out into a folder named after it, so a uv path source next to it (../<sibling>) resolves.
+# A private sibling is read with a read-only deploy key passed as the `sibling-ssh-key` secret.
+name: Python (uv)
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        default: "3.13"
+      sibling-repository:
+        description: owner/name of a repo checked out next to this one (optional)
+        type: string
+        default: ""
+      sibling-path:
+        description: Folder for the sibling, as the uv path source expects (e.g. voice-pipeline)
+        type: string
+        default: ""
+      sibling-ref:
+        description: Branch of the sibling; defaults to this run's base or current branch
+        type: string
+        default: ""
+      timeout-minutes:
+        type: number
+        default: 15
+    secrets:
+      sibling-ssh-key:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ${{ github.event.repository.name }}
+      - if: inputs.sibling-repository != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.sibling-repository }}
+          ref: ${{ inputs.sibling-ref || github.base_ref || github.ref_name }}
+          ssh-key: ${{ secrets.sibling-ssh-key }}
+          path: ${{ inputs.sibling-path }}
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ inputs.python-version }}
+      - working-directory: ${{ github.event.repository.name }}
+        run: |
+          uv sync --frozen
+          uv run ruff check .
+          uv run ruff format --check .
+          uv run pyright
+          uv run pytest -q

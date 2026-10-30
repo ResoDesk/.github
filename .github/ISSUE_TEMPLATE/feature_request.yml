@@ -1,0 +1,22 @@
+name: Feature or change
+description: New behaviour or a change to an agreed design
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Need
+      description: Who needs it and why. Link the requirement or business ID if there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      description: How we will check it works.
+    validations:
+      required: true
